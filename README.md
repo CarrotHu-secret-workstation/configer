@@ -25,11 +25,11 @@ Python 文件 ──▶ │ PythonAdapter   │ ─┘                       （
                  └─────────────────┘
 ```
 
-核心只懂语义模型（§3），不解析任何格式；每种格式由一个**适配器**负责解析与写回。
+核心只懂语义模型，不解析任何格式；每种格式由一个**适配器**负责解析与写回。
 
 ---
 
-## ✦ 核心理念（规范 §0.1）
+## ✦ 核心理念
 
 1. **不存在统一文件格式**——核心是语义模型，格式是适配器的私事。
 2. **无损写回是生死线**——`git diff` 只出现用户编辑的那一行，未触碰行字节级不变。
@@ -47,7 +47,7 @@ Python 文件 ──▶ │ PythonAdapter   │ ─┘                       （
 - **结构化标注**（v1.5）——`@type=@min=@max=@enum=@unit=@desc=` 显式声明硬约束
 - **实时落盘**——编辑即时提交（防抖 400ms），外部轮询检测文件变更，原子写防中途崩溃
 - **单实例 + 转交**——`configer open` 第二次调用自动把文件路径转交给已运行的实例
-- **门控校验**——类型错误 / declared 违规 → 红标拦截；inferred 违规 → 黄标放行（I-6）
+- **门控校验**——类型错误 / declared 违规 → 红标拦截；inferred 违规 → 黄标放行
 - **保真写回**——未编辑行字节级不变；浮点字面量风格保留（`0.15`/`100.`/`0.90` 各按原样回写）
 
 ---
@@ -83,8 +83,6 @@ configer open *.yaml --format yaml
 configer --version
 ```
 
-完整契约见规范 §9。
-
 ### 作为库
 
 ```python
@@ -106,8 +104,6 @@ new_bytes = adapter.save(doc, [EditOp(path="robot.speed_limit", new_value=75)])
 Path("config.yaml").write_bytes(new_bytes)  # 未编辑行字节级不变
 ```
 
-完整 API 见规范 §3 / §4 / §7。
-
 ---
 
 ## ✦ 架构（三层）
@@ -118,13 +114,13 @@ Path("config.yaml").write_bytes(new_bytes)  # 未编辑行字节级不变
 | **核心语义模型** | `src/configer/model.py`、`src/configer/core/{session,validation,poller,writeback,checks}.py` | ConfigDoc / EditOp / 门控 / 原子写 / 外部轮询 |
 | **适配器** | `src/configer/adapters/{yaml_adapter,python_adapter}.py` | 格式解析 + token 级写回 |
 
-层间职责边界（规范 §2）：
+层间职责边界：
 
-- 核心**不得**解析任何具体格式（核心 ↔ 适配器通过 §4.1 Adapter 接口 + §3 数据结构解耦）
+- 核心**不得**解析任何具体格式——核心 ↔ 适配器通过 Adapter 接口 + 数据结构解耦
 - 适配器**不负责**文件 I/O / 编码探测 / 原子写 / 外部轮询（这些由核心统一处理）
 - GUI / CLI 是薄壳——核心逻辑可独立单元测试
 
-新增一种文件格式 = 写一个 `Adapter` 子类 + 注册，不动核心任何代码（§4.2）。
+新增一种文件格式 = 写一个 `Adapter` 子类 + 注册，不动核心任何代码。
 
 ---
 
@@ -145,22 +141,23 @@ configer open examples/*.yaml
 
 ```
 configer/
-├── src/configer/          # 源码包
-│   ├── __init__.py        # 版本号
-│   ├── cli.py             # 命令行入口（规范 §9）
-│   ├── model.py           # 语义模型（规范 §3）
-│   ├── registry.py        # 适配器注册表（§4.2）
-│   ├── bytesio.py         # 编码 / BOM / EOL 处理
-│   ├── single_instance.py # 单实例 + 转交（§9.4）
-│   ├── adapters/          # 格式适配器（§4）
-│   ├── core/              # 核心引擎（§7 / §8）
-│   │   ├── session.py     # 编辑生命周期 + 提交门控
-│   │   ├── validation.py  # gate_edit
-│   │   ├── writeback.py   # 原子写
-│   │   ├── poller.py      # 外部变更轮询
-│   │   └── checks.py      # 模型不变量（§3.9）
-│   └── ui/                # GUI（nicegui）
-└── pyproject.toml
+├── README.md
+├── pyproject.toml
+└── src/configer/
+    ├── __init__.py
+    ├── cli.py             # 命令行入口
+    ├── model.py           # 语义模型
+    ├── registry.py        # 适配器注册表
+    ├── bytesio.py         # 编码 / BOM / EOL 处理
+    ├── single_instance.py # 单实例 + 转交
+    ├── adapters/          # 格式适配器
+    ├── core/              # 核心引擎
+    │   ├── session.py     # 编辑生命周期 + 提交门控
+    │   ├── validation.py  # gate_edit
+    │   ├── writeback.py   # 原子写
+    │   ├── poller.py      # 外部变更轮询
+    │   └── checks.py      # 模型不变量
+    └── ui/                # GUI（nicegui）
 ```
 
 ---
