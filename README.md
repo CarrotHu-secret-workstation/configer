@@ -1,6 +1,6 @@
 # configer
 
-> 配置文件 GUI 编辑器：语义模型 + 适配器（规范 [`docs/spec.md`](docs/spec.md) v0.4）
+> 配置文件 GUI 编辑器：语义模型 + 适配器
 
 一个面向机器人/工程项目的配置编辑工具——既能编辑 **Python 模块级常量配置**（`param.py`），
 也能编辑 **深层嵌套 YAML 配置**（ROS 2 风格 `config.yaml`），用同一套语义模型驱动。
@@ -160,32 +160,8 @@ configer/
 │   │   ├── poller.py      # 外部变更轮询
 │   │   └── checks.py      # 模型不变量（§3.9）
 │   └── ui/                # GUI（nicegui）
-├── docs/spec.md           # 规范 v0.4（自洽实现指南）
 └── pyproject.toml
 ```
-
----
-
-## ✦ 规范
-
-完整设计见 [`docs/spec.md`](docs/spec.md)（v0.4）—— 自洽实现指南：
-
-- §3 语义模型（ConfigDoc / ConfigItem / Diagnostic / EditOp）
-- §4 适配器接口与注册
-- §5 注释画像（YAML / Python）
-- §6 结构化标注（@ 标注）
-- §7 写回与保真规则
-- §8 校验语义（硬 / 软校验）
-- §9 CLI 契约
-- §10 GUI 布局与交互
-- §11 验收基准（A-1..A-10）
-- §12 里程碑 M0–M3
-
----
-
-## ✦ 状态
-
-v0.4 草案——M0（规范定稿）+ M1（项目骨架与初始实现）已完成；后续里程碑见 §12。
 
 ---
 
